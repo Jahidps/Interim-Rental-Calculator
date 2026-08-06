@@ -1,4 +1,11 @@
 <!DOCTYPE html>
+<script type="application/json" id="cowork-artifact-meta">
+{
+  "name": "Interim Rental Calculator",
+  "schemaVersion": 1,
+  "description": "Paymentsave Interim Rental Calculator — enter a start date, end date and monthly rental; computes a daily rate from the number of days in the end-date month, multiplies by the day span between the two dates, and adds 20% VAT. Includes Reset. Self-contained, no connector data."
+}
+</script>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -221,10 +228,11 @@
     const endYear = end.getFullYear();
     const dim = daysInMonth(endMonth, endYear);
     const diffDays = Math.round((end - start) / 86400000);
-    const dailyRate = amount / dim;
-    const interim = dailyRate * diffDays;
-    const vat = interim * 0.2;
-    const total = interim + vat;
+    const r2 = n => Math.round((n + Number.EPSILON) * 100) / 100;
+    const dailyRate = r2(amount / dim);        // per-day rate rounded to 2 decimals first
+    const interim = r2(dailyRate * diffDays);  // then multiply by the day count
+    const vat = r2(interim * 0.2);
+    const total = r2(interim + vat);
 
     const rows = [
       [`Days in ${months[endMonth-1]} ${endYear}`, `${dim} days`],
